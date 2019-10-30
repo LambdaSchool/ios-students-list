@@ -57,7 +57,7 @@ class StudentController {
         
         
     }
-    
+    //this filter is tracking the type of key the value object has. its returning that in an array of Students.
     func filter(with trackType: TrackType, sortedBy sorter: SortOptions) -> [Student] {
         var updatedStudents: [Student]
         
@@ -71,7 +71,7 @@ class StudentController {
         default:
             updatedStudents = students
         }
-        
+        //this is sorting through the first names and alphabetically saving them.
         if sorter == .firstName {
             updatedStudents = updatedStudents.sorted {$0.firstName < $1.firstName}
         } else {
