@@ -11,4 +11,12 @@ import Foundation
 struct Student: Codable {
     var name: String
     var course: String
+    //creating two computed properties that split the name property into first and last names.
+    var firstName: String {
+        return String(name.split(separator: " ")[0])
+    }
+    var lastName: String {
+        return String(name.split(separator: " ").last ?? "")
+    }
+    
 }
