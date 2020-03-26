@@ -24,7 +24,7 @@ class StudentsViewController: UIViewController {
             tableView.reloadData()
         }
     }
-    
+    //only view that needs to see the student contrller is this class. so it is private.
     private var studentsController = StudentController()
 
     override func viewDidLoad() {
@@ -49,6 +49,8 @@ class StudentsViewController: UIViewController {
     
     // MARK: - Action Handlers
     
+    
+    // using the update data source methods.
     @IBAction func sort(_ sender: UISegmentedControl) {
         updateDataSource()
     }
@@ -61,7 +63,9 @@ class StudentsViewController: UIViewController {
     
     private func updateDataSource() {
         //lets you access the filter control we mades segments indexes. we assigned it to an object called filter
+        //we are using nil coelecing here to make sure we have a value. 
         let filter = TrackType(rawValue: filterSelector.selectedSegmentIndex) ?? .none
+        //this is sorting things by the first name. 👇
         let sort = SortOptions(rawValue: sortSelector.selectedSegmentIndex) ?? .firstName
         filteredAndSortedStudents = studentsController.filter(with: filter, sortedBy: sort)
     }
