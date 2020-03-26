@@ -16,38 +16,72 @@ class StudentsViewController: UIViewController {
     @IBOutlet weak var filterSelector: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
     
+    
     // MARK: - Properties
+    
+    private var filteredAndSortedStudents: [Student] = [] {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+    //only view that needs to see the student contrller is this class. so it is private.
+    private var studentsController = StudentController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         tableView.dataSource = self
+        
+        //techinically a UI update, placing the code on a background queue.
+        studentsController.loadFromPersistentStore { students, error in
+            if let error = error {
+                print("Error loading students: \(error)")
+                return
+            }
+            
+            //makes sure that the updating of the ui is happening on the main thread.
+            DispatchQueue.main.async {
+                if let students = students {
+                    self.filteredAndSortedStudents = students
+                }
+            }
+        }
     }
     
     // MARK: - Action Handlers
     
+    
+    // using the update data source methods.
     @IBAction func sort(_ sender: UISegmentedControl) {
+        updateDataSource()
     }
     
     @IBAction func filter(_ sender: UISegmentedControl) {
+        updateDataSource()
     }
     
     // MARK: - Private
     
     private func updateDataSource() {
-        
+        //lets you access the filter control we mades segments indexes. we assigned it to an object called filter
+        //we are using nil coelecing here to make sure we have a value. 
+        let filter = TrackType(rawValue: filterSelector.selectedSegmentIndex) ?? .none
+        //this is sorting things by the first name. 👇
+        let sort = SortOptions(rawValue: sortSelector.selectedSegmentIndex) ?? .firstName
+        filteredAndSortedStudents = studentsController.filter(with: filter, sortedBy: sort)
     }
 }
 
 extension StudentsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return filteredAndSortedStudents.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "StudentCell", for: indexPath)
         
-        // Configure cell
+        let aStudent = filteredAndSortedStudents[indexPath.row]
+        cell.textLabel?.text = aStudent.name
+        cell.detailTextLabel?.text = aStudent.course
         
         return cell
     }
